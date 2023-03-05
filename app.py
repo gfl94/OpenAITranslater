@@ -1,4 +1,4 @@
-import os
+﻿import os
 
 import openai
 from flask import Flask, redirect, render_template, request, url_for
@@ -10,16 +10,17 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 @app.route("/", methods=("GET", "POST"))
 def index():
     if request.method == "POST":
-        animal = request.form["animal"]
+        Sentence = request.form["Sentence"]
         response = openai.Completion.create(
             model="text-davinci-003",
-            prompt=generate_prompt(animal),
+            prompt=translate(Sentence),
             temperature=0.6,
         )
-        return redirect(url_for("index", result=response.choices[0].text))
+        return redirect(url_for("index", result= response.choices[0].text, sentence= Sentence))
 
     result = request.args.get("result")
-    return render_template("index.html", result=result)
+    sentence = request.args.get("sentence")
+    return render_template("index.html", result=result, sentence=sentence)
 
 
 def generate_prompt(animal):
@@ -33,3 +34,10 @@ Animal: {}
 Names:""".format(
         animal.capitalize()
     )
+
+def translate(sentence):
+    res = """
+    Translate this into English: 
+    {}
+    """.format(sentence)
+    return res
